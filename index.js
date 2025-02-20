@@ -33,6 +33,32 @@ async function run() {
   const tasks = taskCollection.collection('tasks')
   const users = taskCollection.collection('users')
 
+  // Middlewares
+  const verifyToken = (req, res, next) => {
+   // console.log(req.headers);
+   if (!req.headers.authorization) {
+    return res.status(401).send({ message: 'unauthorized access' })
+   }
+   const token = req.headers.authorization.split(' ')[1]
+   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+    if (err) {
+     return res.status(401).send({ message: 'unauthorized access' })
+    }
+    req.decoded = decoded
+    next()
+   })
+  }
+
+  // JWT API
+  app.post('/jwt', async (req, res) => {
+   const user = req.body
+   // console.log("User Info Received:", user);
+   const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: '1h'
+   })
+   res.send({ token })
+  })
+
   // Users API
   app.post('/users', async (req, res) => {
    const user = req.body
