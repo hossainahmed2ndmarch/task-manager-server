@@ -29,7 +29,8 @@ const io = new Server(server, {
  cors: {
   origin: "*",
   methods: ["GET", "POST", "PATCH", "DELETE"]
- }
+ },
+ transports: ["websocket", "polling"],
 });
 
 async function run() {
@@ -168,7 +169,7 @@ async function run() {
   // REAL-TIME UPDATES WITH CHANGE STREAMS
   const changeStream = tasks.watch();
   changeStream.on("change", () => {
-   io.emit("task_updated"); 
+   io.emit("task_updated");
   });
 
   // console.log("Real-time updates enabled!");
